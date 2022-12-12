@@ -3,6 +3,7 @@ function handle404Errors(req, res, next) {
 }
 
 function handle500Errors(err, req, res, next) {
+    console.log(err);
     res.status(500).send( { "msg": "Server error!!!!! "} );
 }
 

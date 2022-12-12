@@ -1,6 +1,6 @@
 const { selectCategories } = require('../models/categories.js');
 
-function getCategories(req, res) {
+function getCategories(req, res, next) {
     selectCategories()
         .then((categories) => {
             res.status(200).send( { categories } );
