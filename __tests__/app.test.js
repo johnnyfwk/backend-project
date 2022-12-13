@@ -48,7 +48,6 @@ describe("GET /api/reviews", () => {
             .expect(200)
             .then((response) => {
                 const reviews = response.body.reviews;
-                expect(reviews).toBeInstanceOf(Array);
                 expect(reviews).toHaveLength(13);
                 expect(reviews).toBeSortedBy("created_at", {descending: true});
                 reviews.forEach((review) => {
