@@ -1,7 +1,6 @@
 const db = require('../db/connection.js');
 
-function selectReviews() {
-    
+function selectReviews() {    
     const queryString = `
         SELECT
             reviews.owner,
@@ -26,4 +25,16 @@ function selectReviews() {
         })
 }
 
-module.exports = { selectReviews };
+function selectComments() {
+    const queryString = `
+        SELECT * FROM reviews;
+    `
+
+    return db
+        .query(queryString)
+        .then((result) => {
+            console.log(result);
+        })
+}
+
+module.exports = { selectReviews, selectComments };
