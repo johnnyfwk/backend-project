@@ -1,4 +1,4 @@
-const { selectReviews } = require('../models/reviews.js');
+const { selectReviews, selectReviewById } = require('../models/reviews.js');
 
 function getReviews(req, res, next) {
     selectReviews()
@@ -10,4 +10,15 @@ function getReviews(req, res, next) {
         })
 }
 
-module.exports = { getReviews };
+function getReviewById(req, res, next) {
+    const reviewId = req.params.review_id;
+    selectReviewById(reviewId)
+        .then((review) => {
+            res.status(200).send( { review } );
+        })
+        .catch((err) => {
+            next(err);
+        })    
+}
+
+module.exports = { getReviews, getReviewById };
