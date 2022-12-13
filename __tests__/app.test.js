@@ -10,6 +10,17 @@ afterAll(() => {
     db.end();
 })
 
+describe("Handling 404 Errors", () => {
+    test("Returns a 404 status code when the path does not exist.", () => {
+        return request(app)
+            .get(`/api/non-existent-path`)
+            .expect(404)
+            .then((response) => {
+                expect(response.body).toEqual( { "msg": "Path does not exist!!!!!" } );
+            })
+    })
+})
+
 describe("GET /api/categories", () => {
     test("Returns a 200 status code and an array of category objects each of which should have a 'slug' and 'description' property.", () => {
         return request(app)
@@ -28,13 +39,32 @@ describe("GET /api/categories", () => {
                 })
             })
     })
+})
 
-    test("Returns a 404 status code when the path does not exist.", () => {
+describe("GET /api/reviews", () => {
+    test("Returns a 200 status code and an array of review objects", () => {
         return request(app)
-            .get(`/api/random-path`)
-            .expect(404)
+            .get('/api/reviews')
+            .expect(200)
             .then((response) => {
-                expect(response.body).toEqual( { "msg": "Path does not exist!!!!!" } );
+                const reviews = response.body.reviews;
+                expect(reviews).toHaveLength(13);
+                expect(reviews).toBeSortedBy("created_at", {descending: true});
+                reviews.forEach((review) => {
+                    expect(review).toEqual(
+                        expect.objectContaining({
+                            owner: expect.any(String),
+                            title: expect.any(String),
+                            review_id: expect.any(Number),
+                            category: expect.any(String),
+                            review_img_url: expect.any(String),
+                            created_at: expect.any(String),
+                            votes: expect.any(Number),
+                            designer: expect.any(String),
+                            comment_count: expect.any(String)
+                        })
+                    )
+                })
             })
     })
 })
