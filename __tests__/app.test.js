@@ -68,3 +68,45 @@ describe("GET /api/reviews", () => {
             })
     })
 })
+
+describe("GET /api/reviews/:review_id", () => {
+    test("Returns a 200 status code and a single review object when the path includes a valid review ID.", () => {
+        const REVIEW_ID = 3;
+        return request(app)
+            .get(`/api/reviews/${REVIEW_ID}`)
+            .expect(200)
+            .then((response) => {
+                expect(response.body.review).toEqual( {
+                    review_id: REVIEW_ID,
+                    title: "Ultimate Werewolf",
+                    designer: "Akihisa Okui",
+                    owner: "bainesface",
+                    review_img_url: "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+                    review_body: "We couldn't find the werewolf!",
+                    category: "social deduction",
+                    created_at: "2021-01-18T10:01:41.251Z",
+                    votes: 5
+                } )
+            })
+    })
+
+    test("Returns a 404 when the review ID is valid but does not exist.", () => {
+        const REVIEW_ID = 123456789;
+        return request(app)
+            .get(`/api/reviews/${REVIEW_ID}`)
+            .expect(404)
+            .then((response) => {
+                expect(response.body).toEqual( { "msg": "ID is valid but does not exist!!!!!" } );
+            })
+    })
+
+    test("Returns a 400 when the review ID is invalid.", () => {
+        const REVIEW_ID = "invalid-id";
+        return request(app)
+            .get(`/api/reviews/${REVIEW_ID}`)
+            .expect(400)
+            .then((response) => {
+                expect(response.body).toEqual( { "msg": "Query or column does not exist!!!!!" } );
+            })
+    })
+})
