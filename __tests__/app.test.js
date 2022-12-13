@@ -11,7 +11,7 @@ afterAll(() => {
 })
 
 describe("Handling 404 Errors", () => {
-    test("Returns a 404 status code when the path does not exist.", () => {
+    test("Returns a 404 status code when a path does not exist.", () => {
         return request(app)
             .get(`/api/non-existent-path`)
             .expect(404)
@@ -72,5 +72,44 @@ describe("GET /api/reviews", () => {
 describe("GET /api/reviews/:review_id/comments", () => {
     test("Returns a 200 status code and an array of comments associated with a review ID.", () => {
         const reviewId = 2;
+        return request(app)
+            .get(`/api/reviews/${reviewId}/comments`)
+            .expect(200)
+            .then((response) => {
+                const commentsById = response.body.commentsById;
+                expect(commentsById).toBeSortedBy( "created_at", {descending: true} );
+                commentsById.forEach((comment) => {
+                    expect(comment).toEqual(
+                        expect.objectContaining({
+                            comment_id: expect.any(Number),
+                            votes: expect.any(Number),
+                            created_at: expect.any(String),
+                            author: expect.any(String),
+                            body: expect.any(String),
+                            review_id: expect.any(Number)
+                        })
+                    )
+                })
+            })
+    })
+
+    test("Returns a 404 status code when a review ID is valid but does not exist.", () => {
+        const reviewId = 123456789;
+        return request(app)
+            .get(`/api/reviews/${reviewId}/comments`)
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe( "ID is valid but does not exist!!!!!" );
+            })
+    })
+
+    test("Returns a 400 status code when a review ID is invalid.", () => {
+        const reviewId = "invalid-id";
+        return request(app)
+            .get(`/api/reviews/${reviewId}/comments`)
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe( "Query or column does not exist!!!!!" );
+            })
     })
 })

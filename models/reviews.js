@@ -25,15 +25,20 @@ function selectReviews() {
         })
 }
 
-function selectComments() {
+function selectComments(reviewId) {
     const queryString = `
-        SELECT * FROM reviews;
+        SELECT * FROM comments
+        WHERE review_id = $1
+        ORDER BY created_at DESC;
     `
 
     return db
-        .query(queryString)
+        .query(queryString, [reviewId])
         .then((result) => {
-            console.log(result);
+            if (result.rowCount === 0) {
+                return Promise.reject( { "status": 404, "msg": "ID is valid but does not exist!!!!!" } );
+            }
+            return result.rows;
         })
 }
 

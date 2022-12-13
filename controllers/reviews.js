@@ -10,12 +10,15 @@ function getReviews(req, res, next) {
         })
 }
 
-function getCommentsForReviewId(req, res, next) {
-    selectComments()
+function getCommentsByReviewId(req, res, next) {
+    const reviewId = req.params.review_id;
+    selectComments(reviewId)
         .then((comments) => {
-            console.log("Comments: ", comments);
-            res.status(200).send( { comments } );
+            res.status(200).send( { "commentsById": comments } );
+        })
+        .catch((err) => {
+            next(err);
         })
 }
 
-module.exports = { getReviews, getCommentsForReviewId };
+module.exports = { getReviews, getCommentsByReviewId };
