@@ -77,6 +77,7 @@ describe("GET /api/reviews/:review_id/comments", () => {
             .expect(200)
             .then((response) => {
                 const commentsById = response.body.commentsById;
+                expect(commentsById).toHaveLength(3);
                 expect(commentsById).toBeSortedBy( "created_at", {descending: true} );
                 commentsById.forEach((comment) => {
                     expect(comment).toEqual(
