@@ -69,6 +69,48 @@ describe("GET /api/reviews", () => {
     })
 })
 
+describe("GET /api/reviews/:review_id", () => {
+    test("Returns a 200 status code and a single review object when the path includes a valid review ID.", () => {
+        const REVIEW_ID = 3;
+        return request(app)
+            .get(`/api/reviews/${REVIEW_ID}`)
+            .expect(200)
+            .then((response) => {
+                expect(response.body.review).toBeInstanceOf(Object);
+            })
+    })
+
+    test("Returns a 404 when the review ID is valid but does not exist.", () => {
+        const REVIEW_ID = 123456789;
+        return request(app)
+            .get(`/api/reviews/${REVIEW_ID}`)
+            .expect(404)
+            .then((response) => {
+                expect(response.body).toEqual( { "msg": "ID is valid but does not exist!!!!!" } );
+            })
+    })
+
+    test("Returns a 400 when the review ID is invalid.", () => {
+        const REVIEW_ID = "invalid-id";
+        return request(app)
+            .get(`/api/reviews/${REVIEW_ID}`)
+            .expect(400)
+            .then((response) => {
+                expect(response.body).toEqual( { "msg": "Query or column does not exist!!!!!" } );
+            })
+    })
+})
+
+
+
+
+
+
+
+
+
+
+
 describe("GET /api/reviews/:review_id/comments", () => {
     test("Returns a 200 status code and an array of comments associated with a review ID.", () => {
         const reviewId = 2;
@@ -121,6 +163,12 @@ describe("GET /api/reviews/:review_id/comments", () => {
             .expect(400)
             .then((response) => {
                 expect(response.body.msg).toBe( "Query or column does not exist!!!!!" );
-            })
-    })
 })
+
+
+
+
+
+
+
+
