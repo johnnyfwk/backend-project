@@ -163,6 +163,8 @@ describe("GET /api/reviews/:review_id/comments", () => {
             .expect(400)
             .then((response) => {
                 expect(response.body.msg).toBe( "Query or column does not exist!!!!!" );
+            })
+        })
 })
 
 
