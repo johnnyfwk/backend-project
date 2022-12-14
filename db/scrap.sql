@@ -7,5 +7,4 @@ SELECT * FROM comments;
 
 SELECT * FROM reviews
 JOIN comments
-ON reviews.review_id = comments.review_id
-ORDER BY reviews.review_id ASC;
+ON reviews.review_id = comments.review_id;

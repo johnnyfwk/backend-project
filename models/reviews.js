@@ -25,6 +25,9 @@ function selectReviews() {
         })
 }
 
+
+
+
 function selectReviewById(reviewId) {
     const stringQuery = `
         SELECT *
@@ -42,4 +45,33 @@ function selectReviewById(reviewId) {
         })
 }
 
-module.exports = { selectReviews, selectReviewById };
+
+function selectComments(reviewId) {
+    const queryString = `
+        SELECT * FROM reviews
+        WHERE review_id = $1;
+    `
+
+    return db
+        .query(queryString, [reviewId])
+        .then((result) => {            
+            if (result.rowCount === 0) {
+                return Promise.reject( { "status": 404, "msg": "ID is valid but does not exist!!!!!" } );
+            }
+            
+            const queryStringForCurrentIds = `
+                SELECT * FROM comments
+                WHERE review_id = $1
+                ORDER BY created_at DESC;
+            `
+            
+            return db
+                .query(queryStringForCurrentIds, [reviewId]);
+        })
+        .then((result) => {
+            return result.rows;
+        })
+}
+
+module.exports = { selectReviews, selectReviewById, selectComments };
+
