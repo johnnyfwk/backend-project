@@ -93,6 +93,16 @@ describe("GET /api/reviews/:review_id/comments", () => {
             })
     })
 
+    test("Returns a 200 status code and an empty array when ID exists in the database but has no comments associated with it.", () => {
+        const reviewId = 1;
+        return request(app)
+            .get(`/api/reviews/${reviewId}/comments`)
+            .expect(200)
+            .then((response) => {
+                expect(response.body.commentsById).toEqual([]);
+            })
+    })
+
     test("Returns a 404 status code when a review ID is valid but does not exist.", () => {
         const reviewId = 123456789;
         return request(app)

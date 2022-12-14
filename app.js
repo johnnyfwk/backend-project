@@ -16,6 +16,7 @@ app.get('/api/reviews', getReviews);
 app.get('/api/reviews/:review_id/comments', getCommentsByReviewId)
 
 app.all("*", handle404Errors);
+
 app.use(handleCustomErrors);
 app.use(queryOrColumnDoesNotExist);
 app.use(handle500Errors);
