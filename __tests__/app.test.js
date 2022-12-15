@@ -158,7 +158,7 @@ describe("GET /api/reviews/:review_id/comments", () => {
 })
 
 describe("POST /api/reviews/:review_id/comments", () => {
-    test.only("Returns a 201 and the posted comment when review ID is valid and exists in the database.", () => {
+    test("Returns a 201 and the posted comment when review ID is valid and exists in the database.", () => {
         const reviewId = 2;
         const comment = {
             "username": "mallionaire",
@@ -213,7 +213,7 @@ describe("POST /api/reviews/:review_id/comments", () => {
             })
     })
 
-    test("Returns 400 status code when a username is entered that does not exist in the database.", () => {
+    test("Returns 404 status code when a username is entered that does not exist in the database.", () => {
         const reviewId = 2;
         const comment = {
             "username": "johnnyfong",
@@ -223,9 +223,52 @@ describe("POST /api/reviews/:review_id/comments", () => {
         return request(app)
             .post(`/api/reviews/${reviewId}/comments`)
             .send(comment)
-            .expect(400)
+            .expect(404)
             .then((response) => {
                 expect(response.body.msg).toBe( "Username does not exist in the database!!!!!" );
+            })
+    })
+
+    test("Returns a 400 status code when the comment is missing a username.", () => {
+        const reviewId = 2;
+        const comment = {
+            "body": "This game is supoib!!!"
+        };
+
+        return request(app)
+            .post(`/api/reviews/${reviewId}/comments`)
+            .send(comment)
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe( "Comment is missing a username. Please include your username with your comment." );
+            })
+    })
+
+    test("Returns a 400 status code when the comment is missing a body.", () => {
+        const reviewId = 2;
+        const comment = {
+            "username": "mallionaire",
+        };
+
+        return request(app)
+            .post(`/api/reviews/${reviewId}/comments`)
+            .send(comment)
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe( "Comment is missing a body. Please write something for your comment." );
+            })
+    })
+
+    test("Returns a 400 status code when the comment is missing both the body and username.", () => {
+        const reviewId = 2;
+        const comment = {};
+
+        return request(app)
+            .post(`/api/reviews/${reviewId}/comments`)
+            .send(comment)
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe( "Comment is missing a body and a username. Please enter your username and write something for your comment." );
             })
     })
 })

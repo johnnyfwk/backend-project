@@ -73,6 +73,22 @@ function selectComments(reviewId) {
 
 
 function addCommentByReviewId(reviewId, commentToAdd) {
+
+    if (commentToAdd.username === undefined || commentToAdd.body === undefined) {
+        if (commentToAdd.username === undefined && commentToAdd.body === undefined) {
+            return Promise.reject( { "status": 400, "msg": "Comment is missing a body and a username. Please enter your username and write something for your comment." } )
+        }
+        else if (commentToAdd.username === undefined) {
+            return Promise.reject( { "status": 400, "msg": "Comment is missing a username. Please include your username with your comment." } )
+        }
+        else if (commentToAdd.body === undefined) {
+            return Promise.reject( { "status": 400, "msg": "Comment is missing a body. Please write something for your comment." } )
+        }
+    }
+    
+
+    
+
     const queryString = `
         SELECT * FROM reviews
         WHERE review_id = $1;
@@ -97,7 +113,7 @@ function addCommentByReviewId(reviewId, commentToAdd) {
         })
         .then((result) => {
             if (result.rowCount === 0) {
-                return Promise.reject( { "status": 400, "msg": "Username does not exist in the database!!!!!" } );
+                return Promise.reject( { "status": 404, "msg": "Username does not exist in the database!!!!!" } );
             }
 
             const queryString = `
