@@ -170,7 +170,7 @@ describe("POST /api/reviews/:review_id/comments", () => {
             .send(comment)
             .expect(201)
             .then((response) => {
-                expect(response.body.comment).toEqual({
+                expect(response.body.comment).toMatchObject({
                     "comment_id": 7,                    
                     "votes": 0,                    
                     "created_at": "2022-05-07T16:51:14.566Z",
@@ -286,7 +286,7 @@ describe("POST /api/reviews/:review_id/comments", () => {
             .send(comment)
             .expect(201)
             .then((response) => {
-                expect(response.body.comment).toEqual({
+                expect(response.body.comment).toMatchObject({
                     "comment_id": 7,                    
                     "votes": 0,                    
                     "created_at": "2022-05-07T16:51:14.566Z",
