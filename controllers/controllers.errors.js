@@ -34,5 +34,11 @@ function handle500Errors(err, req, res, next) {
     res.status(500).send( { "msg": "Server error!!!!!"} );
 }
 
-module.exports = { handle404Errors, handleCustomErrors, handleNonExistentReviewIdsOrUsernames, handleInvalidReviewIds, handle500Errors };
+module.exports = {
+    handle404Errors,
+    handleCustomErrors,
+    handleNonExistentReviewIdsOrUsernames,
+    handleInvalidReviewIds,
+    handle500Errors
+};
 

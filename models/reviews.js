@@ -106,10 +106,37 @@ function addCommentByReviewId(reviewId, commentToAdd) {
         })
 }
 
+
+function updateReviewVotesByReviewId(reviewId, newVotes) {
+    if (newVotes === undefined) {
+        return Promise.reject( { "status": 400, "msg": "You did not provide a valid newVotes object. Please provide one in the format { inc_votes: 1 }." } )
+    }
+
+    const queryString = `
+        UPDATE reviews
+        SET votes = votes + $1
+        WHERE review_id = $2
+        RETURNING *;
+    `
+
+    const queryValues = [newVotes, reviewId];
+
+    return db
+        .query(queryString, queryValues)
+        .then((result) => {
+            if (result.rowCount === 0) {
+                return Promise.reject( { "status": 404, "msg": "ID is valid but does not exist." } );
+            }
+            return result.rows[0];
+        })
+}
+
+
 module.exports = {
     selectReviews,
     selectReviewById,
     selectComments,
-    addCommentByReviewId
+    addCommentByReviewId,
+    updateReviewVotesByReviewId
 };
 

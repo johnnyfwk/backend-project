@@ -2,7 +2,8 @@ const {
     selectReviews,
     selectReviewById,
     selectComments,
-    addCommentByReviewId
+    addCommentByReviewId,
+    updateReviewVotesByReviewId
 } = require('../models/reviews.js');
 
 function getReviews(req, res, next) {
@@ -49,9 +50,23 @@ function postCommentByReviewId(req, res, next) {
         })
 }
 
+function patchReviewVotesByReviewId(req, res, next) {
+    const reviewId = req.params.review_id;
+    const newVotes = req.body.inc_votes;
+    updateReviewVotesByReviewId(reviewId, newVotes)
+        .then((review) => {
+            console.log("Review: ", review);
+            res.status(200).send( { review } );
+        })
+        .catch((err) => {
+            next(err);
+        })
+}
+
 module.exports = {
     getReviews,
     getReviewById,
     getCommentsByReviewId,
-    postCommentByReviewId
+    postCommentByReviewId,
+    patchReviewVotesByReviewId
 };

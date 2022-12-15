@@ -298,3 +298,66 @@ describe("POST /api/reviews/:review_id/comments", () => {
     })
 })
 
+describe("PATCH /api/reviews/:review_id", () => {
+    test("Returns a 200 status code and updated review when review ID is valid and exists in the database.", () => {
+        const reviewId = 2;
+        const newVotes = { "inc_votes": 7 };
+
+        return request(app)
+            .patch(`/api/reviews/${reviewId}`)
+            .send(newVotes)
+            .expect(200)
+            .then((response) => {
+                expect(response.body.review).toMatchObject({
+                    review_id: 2,
+                    title: 'Jenga',
+                    category: 'dexterity',
+                    designer: 'Leslie Scott',
+                    owner: 'philippaclaire9',
+                    review_body: 'Fiddly fun for all the family',
+                    review_img_url: 'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png',
+                    created_at: '2021-01-18T10:01:41.251Z',
+                    votes: 12
+                })
+            })
+    })
+
+    test("Returns a 404 status code when the review ID is valid but does not exist in the database.", () => {
+        const reviewId = 999999;
+        const newVotes = { "inc_votes": 7 };
+
+        return request(app)
+            .patch(`/api/reviews/${reviewId}`)
+            .send(newVotes)
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe( "ID is valid but does not exist." );
+            })
+    })
+
+    test("Returns a 400 status code when the review ID is invalid.", () => {
+        const reviewId = "an-invalid-id";
+        const newVotes = { "inc_votes": 7 };
+
+        return request(app)
+            .patch(`/api/reviews/${reviewId}`)
+            .send(newVotes)
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe( "The review ID you entered is not valid." );
+            })
+    })
+
+    test.only("Returns a 400 status code when newVotes object is empty.", () => {
+        const reviewId = 2;
+        const newVotes = {};
+
+        return request(app)
+            .patch(`/api/reviews/${reviewId}`)
+            .send(newVotes)
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe( "You did not provide a valid newVotes object. Please provide one in the format { inc_votes: 1 }." );
+            })
+    })
+})
