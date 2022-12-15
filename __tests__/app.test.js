@@ -101,16 +101,6 @@ describe("GET /api/reviews/:review_id", () => {
     })
 })
 
-
-
-
-
-
-
-
-
-
-
 describe("GET /api/reviews/:review_id/comments", () => {
     test("Returns a 200 status code and an array of comments associated with a review ID.", () => {
         const reviewId = 2;

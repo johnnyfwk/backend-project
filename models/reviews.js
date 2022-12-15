@@ -26,8 +26,6 @@ function selectReviews() {
 }
 
 
-
-
 function selectReviewById(reviewId) {
     const stringQuery = `
         SELECT *

@@ -1,6 +1,5 @@
 const { selectReviews, selectReviewById, selectComments } = require('../models/reviews.js');
 
-
 function getReviews(req, res, next) {
     selectReviews()
         .then((reviews) => {

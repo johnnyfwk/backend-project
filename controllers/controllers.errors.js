@@ -2,7 +2,6 @@ function handle404Errors(req, res, next) {
     res.status(404).send( { "msg": "Path does not exist!!!!!" } );
 }
 
-
 function handleCustomErrors(err, req, res, next) {
     if (err.status && err.msg) {
         res.status(err.status).send( { "msg": err.msg } );
@@ -11,7 +10,6 @@ function handleCustomErrors(err, req, res, next) {
         next(err);
     }
 }
-
 
 function queryOrColumnDoesNotExist(err, req, res, next) {
     if (err.code === "42703" || err.code === "22P02") {
