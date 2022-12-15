@@ -85,9 +85,6 @@ function addCommentByReviewId(reviewId, commentToAdd) {
             return Promise.reject( { "status": 400, "msg": "Comment is missing a body. Please write something for your comment." } )
         }
     }
-    
-
-    
 
     const queryString = `
         SELECT * FROM reviews
