@@ -96,7 +96,7 @@ describe("GET /api/reviews/:review_id", () => {
             .get(`/api/reviews/${REVIEW_ID}`)
             .expect(400)
             .then((response) => {
-                expect(response.body).toEqual( { "msg": "Query or column does not exist!!!!!" } );
+                expect(response.body).toEqual( { "msg": "The review ID you entered is not valid." } );
             })
     })
 })
@@ -152,7 +152,7 @@ describe("GET /api/reviews/:review_id/comments", () => {
             .get(`/api/reviews/${reviewId}/comments`)
             .expect(400)
             .then((response) => {
-                expect(response.body.msg).toBe( "Query or column does not exist!!!!!" );
+                expect(response.body.msg).toBe( "The review ID you entered is not valid." );
             })
         })
 })
@@ -170,7 +170,7 @@ describe("POST /api/reviews/:review_id/comments", () => {
             .send(comment)
             .expect(201)
             .then((response) => {
-                expect(response.body.postedComment).toEqual({
+                expect(response.body.comment).toEqual({
                     "comment_id": 7,                    
                     "votes": 0,                    
                     "created_at": "2022-05-07T16:51:14.566Z",
@@ -193,7 +193,7 @@ describe("POST /api/reviews/:review_id/comments", () => {
             .send(comment)
             .expect(404)
             .then((response) => {
-                expect(response.body.msg).toBe( "ID is valid but does not exist!!!!!" );
+                expect(response.body.msg).toBe( "The review ID or username you entered does not exist." );
             })
     })
 
@@ -209,11 +209,11 @@ describe("POST /api/reviews/:review_id/comments", () => {
             .send(comment)
             .expect(400)
             .then((response) => {
-                expect(response.body.msg).toBe( "Query or column does not exist!!!!!" );
+                expect(response.body.msg).toBe( "The review ID you entered is not valid." );
             })
     })
 
-    test("Returns 404 status code when a username is entered that does not exist in the database.", () => {
+    test("Returns a 404 status code when a username is entered that does not exist in the database.", () => {
         const reviewId = 2;
         const comment = {
             "username": "johnnyfong",
@@ -225,7 +225,7 @@ describe("POST /api/reviews/:review_id/comments", () => {
             .send(comment)
             .expect(404)
             .then((response) => {
-                expect(response.body.msg).toBe( "Username does not exist in the database!!!!!" );
+                expect(response.body.msg).toBe( "The review ID or username you entered does not exist." );
             })
     })
 
@@ -271,12 +271,30 @@ describe("POST /api/reviews/:review_id/comments", () => {
                 expect(response.body.msg).toBe( "Comment is missing a body and a username. Please enter your username and write something for your comment." );
             })
     })
+
+    test("Returns a 201 status code and the posted comment when the comment contains additional but unnecessary properties and values.", () => {
+        const reviewId = 2;
+        const comment = {
+            "username": "mallionaire",
+            "body": "This game is supoib!!!",
+            "extraProp" : 'this is extra',
+            "extraProp2" : 'this is also extra'
+        };
+
+        return request(app)
+            .post(`/api/reviews/${reviewId}/comments`)
+            .send(comment)
+            .expect(201)
+            .then((response) => {
+                expect(response.body.comment).toEqual({
+                    "comment_id": 7,                    
+                    "votes": 0,                    
+                    "created_at": "2022-05-07T16:51:14.566Z",
+                    "review_id": reviewId,
+                    "author": "mallionaire",
+                    "body": "This game is supoib!!!"
+                });
+            })
+    })
 })
-
-
-
-
-
-
-
 

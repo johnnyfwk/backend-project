@@ -41,8 +41,8 @@ function postCommentByReviewId(req, res, next) {
     const reviewId = req.params.review_id;
     const commentToAdd = req.body;
     addCommentByReviewId(reviewId, commentToAdd)
-        .then((postedComment) => {
-            res.status(201).send( { postedComment } );
+        .then((comment) => {
+            res.status(201).send( { comment } );
         })
         .catch((err) => {
             next(err);

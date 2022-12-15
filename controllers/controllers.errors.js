@@ -11,9 +11,18 @@ function handleCustomErrors(err, req, res, next) {
     }
 }
 
-function queryOrColumnDoesNotExist(err, req, res, next) {
+function handleNonExistentReviewIdsOrUsernames(err, req, res, next) {
+    if (err.code === "23503") {
+        res.status(404).send( { "msg": "The review ID or username you entered does not exist." } );
+    }
+    else {
+        next(err);
+    }
+}
+
+function handleInvalidReviewIds(err, req, res, next) {
     if (err.code === "42703" || err.code === "22P02") {
-        res.status(400).send( { "msg": "Query or column does not exist!!!!!" } );
+        res.status(400).send( { "msg": "The review ID you entered is not valid." } )
     }
     else {
         next(err);
@@ -25,5 +34,5 @@ function handle500Errors(err, req, res, next) {
     res.status(500).send( { "msg": "Server error!!!!!"} );
 }
 
-module.exports = { handle404Errors, handleCustomErrors, queryOrColumnDoesNotExist, handle500Errors };
+module.exports = { handle404Errors, handleCustomErrors, handleNonExistentReviewIdsOrUsernames, handleInvalidReviewIds, handle500Errors };
 
