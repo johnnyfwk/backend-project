@@ -71,5 +71,62 @@ function selectComments(reviewId) {
         })
 }
 
-module.exports = { selectReviews, selectReviewById, selectComments };
+
+function addCommentByReviewId(reviewId, commentToAdd) {
+    const queryString = `
+        SELECT * FROM reviews
+        WHERE review_id = $1;
+    `
+    const queryValues = [reviewId];
+
+    return db
+        .query(queryString, queryValues)
+        .then((result) => {
+            if (result.rowCount === 0) {
+                return Promise.reject( { "status": 404, "msg": "ID is valid but does not exist!!!!!" } );
+            }
+
+            const queryString = `
+                SELECT * FROM users
+                WHERE username = $1;
+            `
+
+            const queryValues = [commentToAdd.username];
+
+            return db.query(queryString, queryValues)              
+        })
+        .then((result) => {
+            if (result.rowCount === 0) {
+                return Promise.reject( { "status": 400, "msg": "Username does not exist in the database!!!!!" } );
+            }
+
+            const queryString = `
+                INSERT INTO comments
+                    (body, author, review_id, votes, created_at)
+                VALUES
+                    ($1, $2, $3, $4, $5)
+                RETURNING *;
+            `
+
+            const queryValues = [
+                commentToAdd.body,
+                commentToAdd.username,
+                reviewId,
+                0,
+                new Date(1651942274566)
+            ];
+
+            return db.query(queryString, queryValues)
+        })
+        .then((result) => {
+            return result.rows[0];
+        })
+}
+
+module.exports = {
+    selectReviews,
+    selectReviewById,
+    selectComments,
+    addCommentByReviewId
+};
 

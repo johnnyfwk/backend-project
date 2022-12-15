@@ -157,6 +157,79 @@ describe("GET /api/reviews/:review_id/comments", () => {
         })
 })
 
+describe("POST /api/reviews/:review_id/comments", () => {
+    test.only("Returns a 201 and the posted comment when review ID is valid and exists in the database.", () => {
+        const reviewId = 2;
+        const comment = {
+            "username": "mallionaire",
+            "body": "This game is supoib!!!"
+        };
+
+        return request(app)
+            .post(`/api/reviews/${reviewId}/comments`)
+            .send(comment)
+            .expect(201)
+            .then((response) => {
+                expect(response.body.postedComment).toEqual({
+                    "comment_id": 7,                    
+                    "votes": 0,                    
+                    "created_at": "2022-05-07T16:51:14.566Z",
+                    "review_id": reviewId,
+                    "author": "mallionaire",
+                    "body": "This game is supoib!!!"
+                });
+            })
+    })
+
+    test("Returns a 404 status code when review ID is valid but does not exist in the database.", () => {
+        const reviewId = 999999;
+        const comment = {
+            "username": "mallionaire",
+            "body": "This game is supoib!!!"
+        };
+        
+        return request(app)
+            .post(`/api/reviews/${reviewId}/comments`)
+            .send(comment)
+            .expect(404)
+            .then((response) => {
+                expect(response.body.msg).toBe( "ID is valid but does not exist!!!!!" );
+            })
+    })
+
+    test("Returns a 400 status code when review ID is invalid.", () => {
+        const reviewId = "an-invalid-id";
+        const comment = {
+            "username": "mallionaire",
+            "body": "This game is supoib!!!"
+        };
+
+        return request(app)
+            .post(`/api/reviews/${reviewId}/comments`)
+            .send(comment)
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe( "Query or column does not exist!!!!!" );
+            })
+    })
+
+    test("Returns 400 status code when a username is entered that does not exist in the database.", () => {
+        const reviewId = 2;
+        const comment = {
+            "username": "johnnyfong",
+            "body": "This game is supoib!!!"
+        };
+
+        return request(app)
+            .post(`/api/reviews/${reviewId}/comments`)
+            .send(comment)
+            .expect(400)
+            .then((response) => {
+                expect(response.body.msg).toBe( "Username does not exist in the database!!!!!" );
+            })
+    })
+})
+
 
 
 
