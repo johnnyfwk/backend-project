@@ -18,6 +18,10 @@ const {
     handle500Errors
 } = require('./controllers/controllers.errors.js');
 
+const {
+    getUsers
+} = require('./controllers/users.js');
+
 const app = express();
 app.use(express.json());
 
@@ -27,6 +31,7 @@ app.get('/api/reviews/:review_id', getReviewById);
 app.get('/api/reviews/:review_id/comments', getCommentsByReviewId);
 app.post('/api/reviews/:review_id/comments', postCommentByReviewId);
 app.patch('/api/reviews/:review_id', patchReviewVotesByReviewId);
+app.get('/api/users', getUsers);
 
 app.all("*", handle404Errors);
 
