@@ -108,18 +108,24 @@ function addCommentByReviewId(reviewId, commentToAdd) {
 
 
 function updateReviewVotesByReviewId(reviewId, newVotes) {
-    if (newVotes === undefined) {
+    if (Object.keys(newVotes).length === 0) {
         return Promise.reject( { "status": 400, "msg": "You did not provide a valid newVotes object. Please provide one in the format { inc_votes: 1 }." } )
     }
-
+    if (!newVotes.hasOwnProperty("inc_votes")) {
+        return Promise.reject( { "status": 400, "msg": "The 'newVotes' object you provided does not include a valid 'inc_votes' key. Please provide one in the format { inc_votes: 1 }." } )
+    }    
+    if (typeof newVotes.inc_votes !== "number") {
+        return Promise.reject( { "status": 400, "msg": "The 'inc_votes' value you entered is invalid. Please enter a valid 'inc_votes' number." } )
+    }
+    
     const queryString = `
         UPDATE reviews
         SET votes = votes + $1
         WHERE review_id = $2
         RETURNING *;
     `
-
-    const queryValues = [newVotes, reviewId];
+    
+    const queryValues = [newVotes.inc_votes, reviewId];
 
     return db
         .query(queryString, queryValues)
@@ -127,6 +133,10 @@ function updateReviewVotesByReviewId(reviewId, newVotes) {
             if (result.rowCount === 0) {
                 return Promise.reject( { "status": 404, "msg": "ID is valid but does not exist." } );
             }
+            if (result.rows[0].votes < 0) {
+                return Promise.reject( { "status": 400, "msg": "The 'inc_votes' value you entered is greater than the number of votes. Please enter a valid 'inc_votes' number." });
+            }
+            
             return result.rows[0];
         })
 }

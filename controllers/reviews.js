@@ -52,10 +52,9 @@ function postCommentByReviewId(req, res, next) {
 
 function patchReviewVotesByReviewId(req, res, next) {
     const reviewId = req.params.review_id;
-    const newVotes = req.body.inc_votes;
+    const newVotes = req.body;
     updateReviewVotesByReviewId(reviewId, newVotes)
         .then((review) => {
-            console.log("Review: ", review);
             res.status(200).send( { review } );
         })
         .catch((err) => {
