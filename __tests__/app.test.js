@@ -474,3 +474,336 @@ describe("GET /api/users", () => {
             })
     })
 })
+
+describe("GET /api/reviews (queries)", () => {
+    describe("No queries appended to the path:", () => {        
+        test("Returns a 200 status code and an array of all review objects when no queries are appended to the path.", () => {
+            return request(app)
+                .get('/api/reviews')
+                .expect(200)
+                .then((response) => {
+                    expect(response.body.reviews).toHaveLength(13);
+                    response.body.reviews.forEach((review) => {
+                        expect(review).toEqual(
+                            expect.objectContaining({
+                                review_id: expect.any(Number),
+                                title: expect.any(String),
+                                category: expect.any(String),
+                                designer: expect.any(String),
+                                owner: expect.any(String),
+                                review_body: expect.any(String),
+                                review_img_url: expect.any(String),
+                                created_at: expect.any(String),
+                                votes: expect.any(Number)
+                            })
+                        )
+                    })
+                })
+        })
+    })
+
+    describe("Category:", () => {
+        test("Returns a 200 status code and an array of review objects filtered by the category query when included in the path.", () => {
+            const categoryQuery = `dexterity`;
+            return request(app)
+                .get(`/api/reviews/?category=${categoryQuery}`)
+                .expect(200)
+                .then((response) => {
+                    expect(response.body.reviews).toHaveLength(1);
+                    response.body.reviews.forEach((review) => {
+                        expect(review).toEqual(
+                            expect.objectContaining({
+                                review_id: expect.any(Number),
+                                title: expect.any(String),
+                                category: expect.any(String),
+                                designer: expect.any(String),
+                                owner: expect.any(String),
+                                review_body: expect.any(String),
+                                review_img_url: expect.any(String),
+                                created_at: expect.any(String),
+                                votes: expect.any(Number)
+                            })
+                        )
+                    })
+                })
+        })
+
+        test("Returns a 400 status code when the category query is an empty string.", () => {
+            const categoryQuery = '';
+            return request(app)
+                .get(`/api/reviews/?category=${categoryQuery}`)
+                .expect(400)
+                .then((response) => {
+                    expect(response.body.msg).toBe("The category you entered is not valid. Please enter a valid category name.")
+                })
+        })
+
+        test("Returns a 400 status code when the category query is invalid.", () => {
+            const categoryQuery = 'invalid-category';
+            return request(app)
+                .get(`/api/reviews/?category=${categoryQuery}`)
+                .expect(400)
+                .then((response) => {
+                    expect(response.body.msg).toBe("The category you entered is not valid. Please enter a valid category name.")
+                })
+        })
+    })
+
+    describe("Sort by:", () => {
+        test("Returns a 200 status code and array of review objects sorted by the 'sort_by' query when it is appended to the path.", () => {
+            const sortByQuery = `title`;
+            return request(app)
+                .get(`/api/reviews/?sort_by=${sortByQuery}`)
+                .expect(200)
+                .then((response) => {
+                    expect(response.body.reviews).toBeSorted(sortByQuery);
+                    expect(response.body.reviews).toHaveLength(13);
+                    response.body.reviews.forEach((review) => {
+                        expect(review).toEqual(
+                            expect.objectContaining({
+                                review_id: expect.any(Number),
+                                title: expect.any(String),
+                                category: expect.any(String),
+                                designer: expect.any(String),
+                                owner: expect.any(String),
+                                review_body: expect.any(String),
+                                review_img_url: expect.any(String),
+                                created_at: expect.any(String),
+                                votes: expect.any(Number)
+                            })
+                        )
+                    })
+                })
+        })
+
+        test("Returns a 200 status code and array of review objects sorted by 'created_at' in descending order by default when 'sort_by' query is not appended to the path.", () => {
+            return request(app)
+                .get(`/api/reviews`)
+                .expect(200)
+                .then((response) => {
+                    expect(response.body.reviews).toBeSorted("created_at");
+                    expect(response.body.reviews).toHaveLength(13);
+                    response.body.reviews.forEach((review) => {
+                        expect(review).toEqual(
+                            expect.objectContaining({
+                                review_id: expect.any(Number),
+                                title: expect.any(String),
+                                category: expect.any(String),
+                                designer: expect.any(String),
+                                owner: expect.any(String),
+                                review_body: expect.any(String),
+                                review_img_url: expect.any(String),
+                                created_at: expect.any(String),
+                                votes: expect.any(Number)
+                            })
+                        )
+                    })
+                })
+        })
+
+        test("Returns a 400 status code when the sortBy query is an empty string.", () => {
+            const sortByQuery = '';
+            return request(app)
+                .get(`/api/reviews/?sort_by=${sortByQuery}`)
+                .expect(400)
+                .then((response) => {
+                    expect(response.body.msg).toBe("The sort_by you entered is not valid. Please enter a valid sort_by property name.")
+                })
+        })
+
+        test("Returns a 400 status code when the sortBy query is invalid", () => {
+            const sortByQuery = `invalid-sort-by-query`;
+            return request(app)
+                .get(`/api/reviews/?sort_by=${sortByQuery}`)
+                .expect(400)
+                .then((response) => {
+                    expect(response.body.msg).toBe( "The sort_by you entered is not valid. Please enter a valid sort_by property name." );
+                })
+        })
+    })
+
+    describe("Order:", () => {
+        test("Returns a 200 status code and an array of review objects sorted by 'created_at' in ascending order when 'order' is 'asc' and 'sort_by' query is not appended to the path.", () => {
+            const orderQuery = 'asc';
+            return request(app)
+                .get(`/api/reviews/?order=${orderQuery}`)
+                .expect(200)
+                .then((response) => {
+                    expect(response.body.reviews).toBeSortedBy("created_at", { descending: false } );
+                    expect(response.body.reviews).toHaveLength(13);
+                    response.body.reviews.forEach((review) => {
+                        expect(review).toEqual(
+                            expect.objectContaining({
+                                review_id: expect.any(Number),
+                                title: expect.any(String),
+                                category: expect.any(String),
+                                designer: expect.any(String),
+                                owner: expect.any(String),
+                                review_body: expect.any(String),
+                                review_img_url: expect.any(String),
+                                created_at: expect.any(String),
+                                votes: expect.any(Number)
+                            })
+                        )
+                    })
+                })
+        })
+
+        test("Returns a 200 status code and an array of review objects sorted by 'created_at' in descending order when 'order' is 'desc' and 'sort_by' query is not appended to the path.", () => {
+            const orderQuery = 'desc';
+            return request(app)
+                .get(`/api/reviews/?order=${orderQuery}`)
+                .expect(200)
+                .then((response) => {
+                    expect(response.body.reviews).toBeSortedBy("created_at", { descending: true } );
+                    expect(response.body.reviews).toHaveLength(13);
+                    response.body.reviews.forEach((review) => {
+                        expect(review).toEqual(
+                            expect.objectContaining({
+                                review_id: expect.any(Number),
+                                title: expect.any(String),
+                                category: expect.any(String),
+                                designer: expect.any(String),
+                                owner: expect.any(String),
+                                review_body: expect.any(String),
+                                review_img_url: expect.any(String),
+                                created_at: expect.any(String),
+                                votes: expect.any(Number)
+                            })
+                        )
+                    })
+                })
+        })
+
+        test("Returns a 400 status code when the 'order' query is a empty string.", () => {
+            const orderQuery = '';
+            return request(app)
+                .get(`/api/reviews/?order=${orderQuery}`)
+                .expect(400)
+                .then((response) => {
+                    expect(response.body.msg).toBe("The order value you entered is not valid. Please enter a valid order value.")
+                })
+        })
+
+        test("Returns a 400 status code when the 'order' query is invalid.", () => {
+            const orderQuery = 'invalid-order';
+            return request(app)
+                .get(`/api/reviews/?order=${orderQuery}`)
+                .expect(400)
+                .then((response) => {
+                    expect(response.body.msg).toBe("The order value you entered is not valid. Please enter a valid order value.")
+                })
+        })
+    })
+
+    describe("Query variations appended to the path:", () => {
+        test("Returns a 200 status code and an array of review objects when the path is appended with 'category', 'sort_by', and 'order' queries.", () => {
+            const categoryQuery = `social deduction`;
+            const sortByQuery = `title`;
+            const orderQuery = `asc`;
+            return request(app)
+                .get(`/api/reviews/?category=${categoryQuery}&sort_by=${sortByQuery}&order=${orderQuery}`)
+                .expect(200)
+                .then((response) => {
+                    expect(response.body.reviews).toHaveLength(11);
+                    expect(response.body.reviews).toBeSortedBy(sortByQuery, { descending: false } );
+                    response.body.reviews.forEach((review) => {
+                        expect(review).toEqual(
+                            expect.objectContaining({
+                                review_id: expect.any(Number),
+                                title: expect.any(String),
+                                category: expect.any(String),
+                                designer: expect.any(String),
+                                owner: expect.any(String),
+                                review_body: expect.any(String),
+                                review_img_url: expect.any(String),
+                                created_at: expect.any(String),
+                                votes: expect.any(Number)
+                            })
+                        )
+                    })
+                })
+        })
+
+        test("Returns a 200 status code and an array of review objects when the path is appended with 'category' and 'sort_by' queries.", () => {
+            const categoryQuery = `social deduction`;
+            const sortByQuery = `title`;
+            return request(app)
+                .get(`/api/reviews/?category=${categoryQuery}&sort_by=${sortByQuery}`)
+                .expect(200)
+                .then((response) => {
+                    expect(response.body.reviews).toHaveLength(11);
+                    expect(response.body.reviews).toBeSorted(sortByQuery);
+                    response.body.reviews.forEach((review) => {
+                        expect(review).toEqual(
+                            expect.objectContaining({
+                                review_id: expect.any(Number),
+                                title: expect.any(String),
+                                category: expect.any(String),
+                                designer: expect.any(String),
+                                owner: expect.any(String),
+                                review_body: expect.any(String),
+                                review_img_url: expect.any(String),
+                                created_at: expect.any(String),
+                                votes: expect.any(Number)
+                            })
+                        )
+                    })
+                })
+        })
+
+        test("Returns a 200 status code and an array of review objects when the path is appended with 'category' and 'order' queries.", () => {
+            const categoryQuery = `social deduction`;
+            const orderQuery = `asc`;
+            return request(app)
+                .get(`/api/reviews/?category=${categoryQuery}&order=${orderQuery}`)
+                .expect(200)
+                .then((response) => {
+                    expect(response.body.reviews).toHaveLength(11);
+                    expect(response.body.reviews).toBeSortedBy("created_at", { descending: false } );
+                    response.body.reviews.forEach((review) => {
+                        expect(review).toEqual(
+                            expect.objectContaining({
+                                review_id: expect.any(Number),
+                                title: expect.any(String),
+                                category: expect.any(String),
+                                designer: expect.any(String),
+                                owner: expect.any(String),
+                                review_body: expect.any(String),
+                                review_img_url: expect.any(String),
+                                created_at: expect.any(String),
+                                votes: expect.any(Number)
+                            })
+                        )
+                    })
+                })
+        })
+
+        test("Returns a 200 status code and an array of review objects when the path is appended with 'sort_by' and 'order' queries.", () => {
+            const sortByQuery = `designer`;
+            const orderQuery = `asc`;
+            return request(app)
+                .get(`/api/reviews/?sort_by=${sortByQuery}&order=${orderQuery}`)
+                .expect(200)
+                .then((response) => {
+                    expect(response.body.reviews).toHaveLength(13);
+                    expect(response.body.reviews).toBeSortedBy( sortByQuery, { descending: false } );
+                    response.body.reviews.forEach((review) => {
+                        expect(review).toEqual(
+                            expect.objectContaining({
+                                review_id: expect.any(Number),
+                                title: expect.any(String),
+                                category: expect.any(String),
+                                designer: expect.any(String),
+                                owner: expect.any(String),
+                                review_body: expect.any(String),
+                                review_img_url: expect.any(String),
+                                created_at: expect.any(String),
+                                votes: expect.any(Number)
+                            })
+                        )
+                    })
+                })
+        })
+    })
+})

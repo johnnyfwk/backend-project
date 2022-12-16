@@ -1,6 +1,55 @@
 const db = require('../db/connection.js');
 
-function selectReviews() {    
+function selectReviews(sortBy = "created_at", order = "desc", category) {
+    const validCategories = [
+        "euro game",
+        "dexterity",
+        "social deduction"
+    ];
+
+    const validSortByProperties = [
+        "title",
+        "designer",
+        "owner",
+        "review_img_url",
+        "review_body",
+        "category",
+        "created_at",
+        "votes"
+    ];
+
+    const validOrders = [
+        "asc",
+        "desc"
+    ];
+    
+    if (!validCategories.includes(category)) {
+        if (category !== undefined) {
+            return Promise.reject( { "status": 400, "msg": "The category you entered is not valid. Please enter a valid category name."} )
+        }
+    }    
+    if (!validSortByProperties.includes(sortBy)) {
+        return Promise.reject( { "status": 400, "msg": "The sort_by you entered is not valid. Please enter a valid sort_by property name."} )
+    }
+    if (!validOrders.includes(order)) {
+        return Promise.reject( { "status": 400, "msg": "The order value you entered is not valid. Please enter a valid order value."} )
+    }
+
+    let queryString = `
+        SELECT *
+        FROM reviews
+    `
+
+    const queryValues = [];
+
+    if (category !== undefined) {
+        queryValues.push(category);
+        queryString += ` WHERE category = $1`
+    }
+
+    queryString += ` ORDER BY ${sortBy} ${order};`
+
+    /*    
     const queryString = `
         SELECT
             reviews.owner,
@@ -18,8 +67,9 @@ function selectReviews() {
         GROUP BY reviews.review_id
         ORDER BY reviews.created_at DESC;
     `
+    */
     return db
-        .query(queryString)
+        .query(queryString, queryValues)
         .then((result) => {
             return result.rows;
         })

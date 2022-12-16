@@ -6,8 +6,11 @@ const {
     updateReviewVotesByReviewId
 } = require('../models/reviews.js');
 
-function getReviews(req, res, next) {
-    selectReviews()
+function getReviews(req, res, next) {    
+    const category = req.query.category;    
+    const sortBy = req.query.sort_by;
+    const order = req.query.order;
+    selectReviews(sortBy, order, category)
         .then((reviews) => {
             res.status(200).send( { reviews } );
         })
