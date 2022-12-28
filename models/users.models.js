@@ -5,7 +5,7 @@ function selectUsers() {
         SELECT *
         FROM users;
     `
-
+    
     return db
         .query(queryString)
         .then((result) => {

@@ -1,6 +1,10 @@
 const express = require('express');
+const app = express();
+app.use(express.json());
 
-const { getCategories } = require('./controllers/categories.js');
+const {
+    getCategories
+} = require('./controllers/categories.controllers.js');
 
 const {
     getReviews,
@@ -8,36 +12,38 @@ const {
     getCommentsByReviewId,
     postCommentByReviewId,
     patchReviewVotesByReviewId
-} = require('./controllers/reviews.js');
-
-const {
-    handle404Errors,
-    handleCustomErrors,
-    handleNonExistentReviewIdsOrUsernames,
-    handleInvalidReviewIds,
-    handle500Errors
-} = require('./controllers/controllers.errors.js');
+} = require('./controllers/reviews.controllers.js');
 
 const {
     getUsers
-} = require('./controllers/users.js');
+} = require('./controllers/users.controllers.js');
 
-const app = express();
-app.use(express.json());
+const {
+    handle404NonExistentPaths,
+    handleCustomErrors,
+    handleValidButNonExistentReviewIdsOrUsernames,
+    handleInvalidReviewAndCommentIds,
+    handle500InternalServerErrors
+} = require('./controllers/errors.controllers.js');
+
+const {
+    deleteCommentByCommentId
+} = require('./controllers/comments.controllers.js');
 
 app.get('/api/categories', getCategories);
-app.get('/api/reviews/', getReviews);
+app.get('/api/reviews', getReviews);
 app.get('/api/reviews/:review_id', getReviewById);
 app.get('/api/reviews/:review_id/comments', getCommentsByReviewId);
 app.post('/api/reviews/:review_id/comments', postCommentByReviewId);
 app.patch('/api/reviews/:review_id', patchReviewVotesByReviewId);
 app.get('/api/users', getUsers);
+app.delete('/api/comments/:comment_id', deleteCommentByCommentId);
 
-app.all("*", handle404Errors);
+app.all('*', handle404NonExistentPaths);
 
 app.use(handleCustomErrors);
-app.use(handleNonExistentReviewIdsOrUsernames);
-app.use(handleInvalidReviewIds);
-app.use(handle500Errors);
+app.use(handleValidButNonExistentReviewIdsOrUsernames);
+app.use(handleInvalidReviewAndCommentIds);
+app.use(handle500InternalServerErrors);
 
 module.exports = app;
