@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 app.use(express.json());
+const cors = require('cors');
 
 const {
     getCategories
@@ -29,6 +30,8 @@ const {
 const {
     deleteCommentByCommentId
 } = require('./controllers/comments.controllers.js');
+
+app.use(cors());
 
 app.get('/api/categories', getCategories);
 app.get('/api/reviews', getReviews);
